@@ -3,10 +3,7 @@ import pandas as pd
 
 
 def ipysheet_grid(data, indexed=True):
-    if isinstance(data, list):
-        data = pd.DataFrame(data)
-        drop_index = False
-    elif isinstance(data, dict):
+    if isinstance(data, (list, dict)):
         data = pd.DataFrame(data)
         drop_index = False
     else:

@@ -12,8 +12,7 @@ class MatplotlibPlot(BasePlot):
         if not _INITED:
             if in_ipynb():
                 from IPython import get_ipython
-                ipython = get_ipython()
-                if ipython:
+                if ipython := get_ipython():
                     ipython.magic("matplotlib inline")
                     ipython.magic("config InlineBackend.figure_format = 'retina'")
             _INITED = True
@@ -178,7 +177,7 @@ class MatplotlibPlot(BasePlot):
             y_axises.append(d[2])
             stackedes.append(d[3])
             kwargses.append(d[4])
-            for col in d[0].columns:
+            for _ in d[0].columns:
                 if (d[2] is None or d[2] == 'left') and not d[3]:
                     left_count += 1
                 elif d[2] == 'right' and not d[3]:
@@ -194,14 +193,12 @@ class MatplotlibPlot(BasePlot):
             for col in d[0].columns:
                 if d[2] == 'right':
                     x = ax2.bar(d[0].index + count * ((d[0].index[1] - d[0].index[0]) / (left_count + right_count)), d[0][col], width=width, color=d[1], **d[4])
-                    self._legend.append((col, x, d[2]))
-                    x.set_label(col)
-                    count += 1
                 else:
                     x = ax.bar(d[0].index + count * ((d[0].index[1] - d[0].index[0]) / (left_count + right_count)), d[0][col], width=width, color=d[1], **d[4])
-                    self._legend.append((col, x, d[2]))
-                    x.set_label(col)
-                    count += 1
+
+                self._legend.append((col, x, d[2]))
+                x.set_label(col)
+                count += 1
 
     def _hist(self):
         if not self._hists:
@@ -252,7 +249,14 @@ class MatplotlibPlot(BasePlot):
             x = data.columns[0]
             y = data.columns[i]
             c = get_color(i, col, color)
-            plt.plot(data[x], data[y], marker='.', linewidth=0, color=c, label='%s vs %s' % (x, y))
+            plt.plot(
+                data[x],
+                data[y],
+                marker='.',
+                linewidth=0,
+                color=c,
+                label=f'{x} vs {y}',
+            )
 
     def step(self, data, color=None, y_axis='left', **kwargs):
         for i, col in enumerate(data):

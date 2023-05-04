@@ -232,13 +232,13 @@ def make_graph(value):
 
     elif value == 1:
         x_secondary = xlist
-        y_secondary = [ylist[-1] for i in xlist]
+        y_secondary = [ylist[-1] for _ in xlist]
         z_secondary = zlist[-1]
         opacity = 0.7
 
     elif value == 4:
         z_secondary = [z[8] for z in zlist]
-        x_secondary = ['10-year' for i in z_secondary]
+        x_secondary = ['10-year' for _ in z_secondary]
         y_secondary = ylist
         opacity = 0.25
 
@@ -368,9 +368,7 @@ def make_graph(value):
         )
     )
 
-    figure = dict(data=data, layout=layout)
-    # py.iplot(figure)
-    return figure
+    return dict(data=data, layout=layout)
 
 
 # Make annotations

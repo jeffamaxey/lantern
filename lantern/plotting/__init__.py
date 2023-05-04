@@ -12,9 +12,9 @@ _BACKENDS = ['cufflinks', 'plotly', 'bokeh', 'highcharts', 'matplotlib', 'seabor
 
 
 def _backend_to_plot_obj(backend, size=None, theme=None):
-    if backend == 'matplotlib' or backend == 'seaborn':
+    if backend in ['matplotlib', 'seaborn']:
         return MatplotlibPlot(size, theme)
-    if backend == 'cufflinks' or backend == 'plotly':
+    if backend in ['cufflinks', 'plotly']:
         return PlotlyPlot(size, theme)
     if backend == 'bokeh':
         return BokehPlot(size, theme)
@@ -29,15 +29,14 @@ def _backend_to_plot_obj(backend, size=None, theme=None):
 
 def figure(backend='matplotlib', size=None, theme=None):
     if backend not in _BACKENDS:
-        raise Exception('Must pick backend in %s' % _BACKENDS)
+        raise Exception(f'Must pick backend in {_BACKENDS}')
     return _backend_to_plot_obj(backend, size, theme)
 
 
 def plot(data, kind='line', backend='matplotlib', size=None, theme=None, **kwargs):
     f = figure(backend, size, theme)
 
-    show_args = {}
-    show_args['title'] = kwargs.pop('title', '')
+    show_args = {'title': kwargs.pop('title', '')}
     show_args['xlabel'] = kwargs.pop('xlabel', '')
     show_args['ylabel'] = kwargs.pop('ylabel', '')
     show_args['xaxis'] = kwargs.pop('xaxis', True)
@@ -65,6 +64,6 @@ def plot(data, kind='line', backend='matplotlib', size=None, theme=None, **kwarg
             raise LanternException('Must specify type for each column')
         for k, v in iteritems(kind):
             if k not in data.columns:
-                raise LanternException('Unrecognized column: %s' % str(k))
+                raise LanternException(f'Unrecognized column: {str(k)}')
             getattr(f, v)(data[[k]], **kwargs)
         return f.show(**show_args)

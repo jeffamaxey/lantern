@@ -13,9 +13,8 @@ _INITED = False
 class BokehPlot(BasePlot):
     def __init__(self, size=None, theme=None):
         global _INITED
-        if not _INITED:
-            if in_ipynb():
-                output_notebook(hide_banner=True)
+        if not _INITED and in_ipynb():
+            output_notebook(hide_banner=True)
 
         size = size or (800, 500)
         self.width = size[0]
@@ -89,11 +88,10 @@ class BokehPlot(BasePlot):
             # for stacked: https://bokeh.pydata.org/en/latest/docs/gallery/brewer.html
             # p.patches([x2] * areas.shape[1], [areas[c].values for c in areas], color=colors, alpha=0.8, line_color=None)
 
-    def _stacked(df):
-        df_top = df.cumsum(axis=1)
+    def _stacked(self):
+        df_top = self.cumsum(axis=1)
         df_bottom = df_top.shift(axis=1).fillna({'y0': 0})[::-1]
-        df_stack = pd.concat([df_bottom, df_top], ignore_index=True)
-        return df_stack
+        return pd.concat([df_bottom, df_top], ignore_index=True)
 
     def bar(self, data, color=None, y_axis='left', stacked=False, **kwargs):
         # stacked bar: https://bokeh.pydata.org/en/latest/docs/gallery/bar_stacked.html
@@ -129,14 +127,16 @@ class BokehPlot(BasePlot):
             x = data.columns[0]
             y = data.columns[i]
             c = get_color(i, col, color)
-            fig = self.figure.scatter(x=data[x],
-                                      y=data[y],
-                                      legend='%s vs %s' % (x, y),
-                                      fill_color=c,
-                                      fill_alpha=0.6,
-                                      line_color=None,
-                                      **kwargs)
-            self.legend.append(('%s vs %s' % (x, y), [fig]))
+            fig = self.figure.scatter(
+                x=data[x],
+                y=data[y],
+                legend=f'{x} vs {y}',
+                fill_color=c,
+                fill_alpha=0.6,
+                line_color=None,
+                **kwargs,
+            )
+            self.legend.append((f'{x} vs {y}', [fig]))
 
     def step(self, data, color=None, y_axis='left', **kwargs):
         raise NotImplementedError()

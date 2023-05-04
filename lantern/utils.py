@@ -6,12 +6,9 @@ class LanternException(Exception):
 
 
 def in_ipynb():
-    ip = get_ipython()
-    if ip:
+    if ip := get_ipython():
         cfg = ip.config
-        if cfg.get('IPKernelApp', False):
-            return True
-        return False
+        return bool(cfg.get('IPKernelApp', False))
     return False
 
 

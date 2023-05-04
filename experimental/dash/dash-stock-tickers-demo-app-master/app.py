@@ -66,10 +66,12 @@ def update_graph(tickers):
         try:
             df = pyEX.chartDF(str(ticker), '6m').reset_index()
         except:
-            graphs.append(html.H3(
-                'Data is not available for {}, please retry later.'.format(ticker),
-                style={'marginTop': 20, 'marginBottom': 20}
-            ))
+            graphs.append(
+                html.H3(
+                    f'Data is not available for {ticker}, please retry later.',
+                    style={'marginTop': 20, 'marginBottom': 20},
+                )
+            )
             continue
 
         candlestick = {
@@ -85,15 +87,23 @@ def update_graph(tickers):
             'decreasing': {'line': {'color': colorscale[1]}}
         }
         bb_bands = bbands(df.close)
-        bollinger_traces = [{
-            'x': df['date'], 'y': y,
-            'type': 'scatter', 'mode': 'lines',
-            'line': {'width': 1, 'color': colorscale[(i*2) % len(colorscale)]},
-            'hoverinfo': 'none',
-            'legendgroup': ticker,
-            'showlegend': True if i == 0 else False,
-            'name': '{} - bollinger bands'.format(ticker)
-        } for i, y in enumerate(bb_bands)]
+        bollinger_traces = [
+            {
+                'x': df['date'],
+                'y': y,
+                'type': 'scatter',
+                'mode': 'lines',
+                'line': {
+                    'width': 1,
+                    'color': colorscale[(i * 2) % len(colorscale)],
+                },
+                'hoverinfo': 'none',
+                'legendgroup': ticker,
+                'showlegend': i == 0,
+                'name': f'{ticker} - bollinger bands',
+            }
+            for i, y in enumerate(bb_bands)
+        ]
         graphs.append(dcc.Graph(
             id=ticker,
             figure={

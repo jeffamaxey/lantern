@@ -9,14 +9,13 @@ def _r():
 
 def get_color(i, col, color):
     if isinstance(color, list):
-        c = (color[i:i + 1] or [_r()])[0]
+        return (color[i:i + 1] or [_r()])[0]
     elif isinstance(color, dict):
-        c = color.get(col, _r())
+        return color.get(col, _r())
     elif isinstance(color, str) and color:
-        c = color
+        return color
     else:
-        c = _r()
-    return c
+        return _r()
 
 
 # def _conf(type, colors, x, y, i, col):
@@ -74,8 +73,7 @@ def get_color(i, col, color):
 
 
 def _parseScatter(kwargs, col):
-    ret = {}
-    ret['x'] = kwargs.get(col, {}).get('x', col)
+    ret = {'x': kwargs.get(col, {}).get('x', col)}
     ret['y'] = kwargs.get(col, {}).get('y', col)
     ret['categories'] = kwargs.get(col, {}).get('categories', col)
     ret['text'] = kwargs.get(col, {}).get('text', col)
@@ -84,8 +82,7 @@ def _parseScatter(kwargs, col):
 
 
 def _parseScatterPie(kwargs, col):
-    ret = {}
-    ret['values'] = kwargs.get(col, {}).get('values', col)
+    ret = {'values': kwargs.get(col, {}).get('values', col)}
     ret['labels'] = kwargs.get(col, {}).get('labels', col)
     return ret
 
@@ -106,15 +103,8 @@ def align_yaxis_np(axes):
     lowers = extrema[:, 0]
     uppers = extrema[:, 1]
 
-    # if all pos or all neg, don't scale
-    all_positive = False
-    all_negative = False
-    if lowers.min() > 0.0:
-        all_positive = True
-
-    if uppers.max() < 0.0:
-        all_negative = True
-
+    all_positive = lowers.min() > 0.0
+    all_negative = uppers.max() < 0.0
     if all_negative or all_positive:
         # don't scale
         return

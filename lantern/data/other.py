@@ -57,7 +57,9 @@ def getTsData(series=2, datetime_index=True, trend=.47, volatility=1):
         movement = np.array([-1 * random() * volatility if random() < trend else random() * volatility for _ in range(series)])
         random_walk[i] = random_walk[i - 1] + movement
 
-    ret = pd.DataFrame(random_walk, columns=['Series ' + str(x) for x in range(series)])
+    ret = pd.DataFrame(
+        random_walk, columns=[f'Series {str(x)}' for x in range(series)]
+    )
 
     if datetime_index is True:
         ret.index = np.array([date.today() - timedelta(days=1000) + timedelta(x) for x in range(1000)])
@@ -119,10 +121,7 @@ def _currencycode():
 
 # pickers
 def person(locale=None):
-    if locale is None:
-        locales = _MIMESIS_LOCALES
-    else:
-        locales = [locale]
+    locales = _MIMESIS_LOCALES if locale is None else [locale]
     p = mimesis.Person(locale=choice(locales))
     gender = choice(['Male'] * 20 + ['Female'] * 21 + ['Other'])
 
@@ -146,20 +145,14 @@ def person(locale=None):
 
 
 def people(count=50, locale=None):
-    acc = []
-    for _ in range(count):
-        acc.append(person(locale))
+    acc = [person(locale) for _ in range(count)]
     return pd.DataFrame(acc)
 
 
 def company(exchanges=None):
     sector = choice(list(finance_enums.US_SECTORS))
     industry = choice(list(finance_enums.US_SECTORS_MAP[sector]))
-    if exchanges:
-        exchange = choice(exchanges)
-    else:
-        exchange = _genExchangeCode()
-
+    exchange = choice(exchanges) if exchanges else _genExchangeCode()
     return {
         'name': fake.company(),
         'address': _address(),
@@ -175,9 +168,7 @@ def company(exchanges=None):
 
 def companies(count=1000):
     exchanges = [_genExchangeCode() for _ in range(5)]
-    acc = []
-    for _ in range(count):
-        acc.append(company(exchanges))
+    acc = [company(exchanges) for _ in range(count)]
     return pd.DataFrame(acc)
 
 
@@ -204,9 +195,7 @@ def trades(count=1000, interval='daily'):
 def superstore(count=1000):
     data = []
     for id in range(count):
-        dat = {}
-        dat['Row ID'] = id
-        dat['Order ID'] = fake.ein()
+        dat = {'Row ID': id, 'Order ID': fake.ein()}
         dat['Order Date'] = fake.date_this_year()
         dat['Ship Date'] = fake.date_between_dates(dat['Order Date']).strftime('%Y-%m-%d')
         dat['Order Date'] = dat['Order Date'].strftime('%Y-%m-%d')

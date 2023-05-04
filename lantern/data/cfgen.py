@@ -178,8 +178,8 @@ def heatmap(n_x=5, n_y=10):
         n_y : int
             Number of y categories
     """
-    x = ['x_' + str(_) for _ in range(n_x)]
-    y = ['y_' + str(_) for _ in range(n_y)]
+    x = [f'x_{str(_)}' for _ in range(n_x)]
+    y = [f'y_{str(_)}' for _ in range(n_y)]
     return pd.DataFrame(surface(n_x - 1, n_y - 1).values, index=x, columns=y)
 
 
@@ -230,11 +230,9 @@ def bars(n=3, n_categories=3, prefix='category', columns=None, mode='abc'):
                 'abc' for alphabet columns
                 'stocks' for random stock names
     """
-    categories = []
     if not columns:
         columns = getName(n, mode=mode)
-    for i in range(n_categories):
-        categories.extend([prefix + str(i + 1)])
+    categories = [prefix + str(i + 1) for i in range(n_categories)]
     data = dict([(x, np.random.randint(1, 100, n_categories)) for x in columns])
     return pd.DataFrame(data, index=categories)
 
@@ -293,8 +291,13 @@ def box(n_traces=5, n=100, mode=None):
                 'abc' for alphabet columns
                 'stocks' for random stock names
     """
-    df = pd.DataFrame([np.random.chisquare(np.random.randint(2, 10), n_traces) for _ in range(n)], columns=getName(n_traces, mode=mode))
-    return df
+    return pd.DataFrame(
+        [
+            np.random.chisquare(np.random.randint(2, 10), n_traces)
+            for _ in range(n)
+        ],
+        columns=getName(n_traces, mode=mode),
+    )
 
 
 def histogram(n_traces=1, n=500, dispersion=2, mode=None):
@@ -313,8 +316,16 @@ def histogram(n_traces=1, n=500, dispersion=2, mode=None):
                 'abc' for alphabet columns
                 'stocks' for random stock names
     """
-    df = pd.DataFrame(np.transpose([np.random.randn(n) + np.random.randint(-1 * dispersion, dispersion) for _ in range(n_traces)]), columns=getName(n_traces, mode=mode))
-    return df
+    return pd.DataFrame(
+        np.transpose(
+            [
+                np.random.randn(n)
+                + np.random.randint(-1 * dispersion, dispersion)
+                for _ in range(n_traces)
+            ]
+        ),
+        columns=getName(n_traces, mode=mode),
+    )
 
 
 def distplot(n_traces=1, n=500, dispersion=3, mode=None):
@@ -370,8 +381,10 @@ def surface(n_x=20, n_y=20):
             Number of points along the Y axis
     """
     x = [float(np.random.randint(0, 100))]
-    for i in range(n_x):
-        x.append(x[:1][0] + np.random.randn() * np.random.randint(1, 10))
+    x.extend(
+        x[:1][0] + np.random.randn() * np.random.randint(1, 10)
+        for _ in range(n_x)
+    )
     df = pd.DataFrame(x)
     for i in range(n_y):
         df[i + 1] = df[i].map(lambda x: x + np.random.randn() * np.random.randint(1, 10))

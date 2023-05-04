@@ -10,7 +10,7 @@ _BACKENDS = ['plotly', 'qgrid', 'psp', 'phosphor', 'ipysheet', 'lineup']
 
 
 def _backend_to_grid_foo(backend, theme=None):
-    if backend == 'plotly' or backend == 'cufflinks':
+    if backend in ['plotly', 'cufflinks']:
         return plotly_grid
     if backend == 'qgrid':
         return qgrid_grid
@@ -27,5 +27,5 @@ def _backend_to_grid_foo(backend, theme=None):
 
 def grid(data, backend='psp', **kwargs):
     if backend not in _BACKENDS:
-        raise Exception('Must pick backend in %s' % _BACKENDS)
+        raise Exception(f'Must pick backend in {_BACKENDS}')
     return _backend_to_grid_foo(backend)(data, **kwargs)

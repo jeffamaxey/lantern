@@ -20,7 +20,7 @@ class PlotlyPlot(BasePlot):
         tdata = []
         ldata = {}
 
-        y2_count = sum([1 for (_, _, a, _) in self.figures if a == 'right'])
+        y2_count = sum(1 for (_, _, a, _) in self.figures if a == 'right')
 
         y2s = 2
         y2p = .05 / y2_count if y2_count > 0 else 0
@@ -28,12 +28,8 @@ class PlotlyPlot(BasePlot):
 
         for col, figure, axis, color in self.figures:
             for trace in figure['data']:
-                if axis == 'right':
-                    trace['yaxis'] = 'y%d' % y2s
-                    trace['xaxis'] = 'x'
-                else:
-                    trace['yaxis'] = 'y1'
-                    trace['xaxis'] = 'x'
+                trace['yaxis'] = 'y%d' % y2s if axis == 'right' else 'y1'
+                trace['xaxis'] = 'x'
                 tdata.append(trace)
 
             if axis == 'right':
@@ -51,16 +47,19 @@ class PlotlyPlot(BasePlot):
                 )
         ldata['xaxis'] = dict(domain=[0, 0.95])
 
-        ldata['shapes'] = []
-        for line in self.hlines:
-            ldata['shapes'].append({'x0': 0,
-                                    'x1': 1,
-                                    'y0': line[0],
-                                    'y1': line[0],
-                                    'line': {'color': line[1], 'width': 1, 'dash': 'solid'},
-                                    'xref': 'paper',
-                                    'yref': 'y',
-                                    'type': 'line'})
+        ldata['shapes'] = [
+            {
+                'x0': 0,
+                'x1': 1,
+                'y0': line[0],
+                'y1': line[0],
+                'line': {'color': line[1], 'width': 1, 'dash': 'solid'},
+                'xref': 'paper',
+                'yref': 'y',
+                'type': 'line',
+            }
+            for line in self.hlines
+        ]
         for line in self.vlines:
             ldata['shapes'].append({'y0': 0,
                                     'y1': 1,
@@ -77,15 +76,19 @@ class PlotlyPlot(BasePlot):
             g = str(round(col[1] * 255))
             b = str(round(col[2] * 255))
 
-            ldata['shapes'].append({'x0': 0,
-                                    'x1': 1,
-                                    'y0': line[1],
-                                    'y1': line[0],
-                                    'line': {'color': line[2], 'width': 1, 'dash': 'solid'},
-                                    'xref': 'paper',
-                                    'yref': 'y',
-                                    'type': 'rect',
-                                    'fillcolor': 'rgba(' + r + ',' + g + ',' + b + ',.5)'})
+            ldata['shapes'].append(
+                {
+                    'x0': 0,
+                    'x1': 1,
+                    'y0': line[1],
+                    'y1': line[0],
+                    'line': {'color': line[2], 'width': 1, 'dash': 'solid'},
+                    'xref': 'paper',
+                    'yref': 'y',
+                    'type': 'rect',
+                    'fillcolor': f'rgba({r},{g},{b},.5)',
+                }
+            )
 
         for line in self.vspans:
             col = to_rgb(line[2])
@@ -93,15 +96,19 @@ class PlotlyPlot(BasePlot):
             g = str(round(col[1] * 255))
             b = str(round(col[2] * 255))
 
-            ldata['shapes'].append({'y0': 0,
-                                    'y1': 1,
-                                    'x0': line[1],
-                                    'x1': line[0],
-                                    'line': {'color': line[2], 'width': 1, 'dash': 'solid'},
-                                    'xref': 'x',
-                                    'yref': 'paper',
-                                    'type': 'rect',
-                                    'fillcolor': 'rgba(' + r + ',' + g + ',' + b + ',.5)'})
+            ldata['shapes'].append(
+                {
+                    'y0': 0,
+                    'y1': 1,
+                    'x0': line[1],
+                    'x1': line[0],
+                    'line': {'color': line[2], 'width': 1, 'dash': 'solid'},
+                    'xref': 'x',
+                    'yref': 'paper',
+                    'type': 'rect',
+                    'fillcolor': f'rgba({r},{g},{b},.5)',
+                }
+            )
 
         if title:
             ldata['title'] = title
@@ -205,13 +212,18 @@ class PlotlyPlot(BasePlot):
             x = data.columns[0]
             y = data.columns[i]
             c = get_color(i, col, color)
-            fig = go.Figure(data=[go.Scatter(
-                            x=data[x],
-                            y=data[y],
-                            mode='markers',
-                            marker={'color': c},
-                            name='%s vs %s' % (x, y),
-                            **kwargs)])
+            fig = go.Figure(
+                data=[
+                    go.Scatter(
+                        x=data[x],
+                        y=data[y],
+                        mode='markers',
+                        marker={'color': c},
+                        name=f'{x} vs {y}',
+                        **kwargs,
+                    )
+                ]
+            )
             self.figures.append((col, fig, y_axis, c))
 
     def step(self, data, color=None, y_axis='left', subplot=False, **kwargs):

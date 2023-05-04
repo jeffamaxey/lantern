@@ -110,39 +110,38 @@ def create_figure(highlight_cescode=None, skip_labels=[], show_only=[]):
 
         label = series['meta'][cescode].nytlabel
 
-        traces.append({
-            'x': x,
-            'y': y,
-            'mode': 'lines',
-            'line': {
-                'color': color,
-                'width': width
-            },
-            'text': [
-                ('<b>{}</b><br>'
-                 'Overall job growth: {}%<br>'
-                 'Wages: ${} / hour<br>'
-                 'Jobs: {}k<br>{}').format(
-                    label,
-                    np.around(growth, decimals=1),
-                    np.around(wage_in_year, decimals=1),
-                    jobs_in_year,
-                    year
-                )
-                for year, jobs_in_year, wage_in_year in zip(
-                    list(jobs.index),
-                    list(jobs),
-                    list(series['absolute_wages'][cescode])
-                )
-            ],
-            'legendgroup': legendgroup,
-            'name': name,
-            'hoverinfo': hoverinfo,
-            'showlegend': (
-                False if legendgroup in [t['legendgroup'] for t in traces]
-                else True
-            )
-        })
+        traces.append(
+            {
+                'x': x,
+                'y': y,
+                'mode': 'lines',
+                'line': {'color': color, 'width': width},
+                'text': [
+                    (
+                        '<b>{}</b><br>'
+                        'Overall job growth: {}%<br>'
+                        'Wages: ${} / hour<br>'
+                        'Jobs: {}k<br>{}'
+                    ).format(
+                        label,
+                        np.around(growth, decimals=1),
+                        np.around(wage_in_year, decimals=1),
+                        jobs_in_year,
+                        year,
+                    )
+                    for year, jobs_in_year, wage_in_year in zip(
+                        list(jobs.index),
+                        list(jobs),
+                        list(series['absolute_wages'][cescode]),
+                    )
+                ],
+                'legendgroup': legendgroup,
+                'name': name,
+                'hoverinfo': hoverinfo,
+                'showlegend': legendgroup
+                not in [t['legendgroup'] for t in traces],
+            }
+        )
 
         if (highlight_cescode and cescode in highlight_cescode and
                 (skip_labels and label not in skip_labels) or
